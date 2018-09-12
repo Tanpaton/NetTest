@@ -13,7 +13,7 @@ import java.io.OutputStream;
 //네트워크 관련
 import java.net.*;
 
-public class MainFrame extends JFrame implements ActionListener {
+public class MainFrame extends JFrame implements ActionListener, Runnable {
 	Login login = new Login();
 	WaitRoom wr = new WaitRoom();
 	CardLayout card = new CardLayout();
@@ -32,7 +32,8 @@ public class MainFrame extends JFrame implements ActionListener {
 		setVisible(true);
 
 		login.b1.addActionListener(this);
-		login.b2.addActionListener(this);
+		//login.b2.addActionListener(this);
+		wr.tf.addActionListener(this);
 	}
 
 	public static void main(String[] args) {
@@ -53,16 +54,33 @@ public class MainFrame extends JFrame implements ActionListener {
 				// s=new Socket("211.238.142.46",3355);
 				id = login.tf.getText();
 				name = login.pf.getText();
-				in = new BufferedReader(new InputStreamReader(s.getInputStream())); //Client=>요청값 : 100|123|123을 받는다.
+				in = new BufferedReader(new InputStreamReader(s.getInputStream())); 
+				System.out.println("in: "+in);
 				// 서버에게 메세지값을 보낸다
 				out = s.getOutputStream();
 				out.write((Function.LOGIN + "|" + id + "|" + name + "\n").getBytes());
+				
 			} catch (Exception e1) {
 				// TODO: handle exception
 			}
 			card.show(getContentPane(), "WR");
 		}
+		if(e.getSource() == wr.tf) {
+	         String str = wr.tf.getText();
+	         try {
+	        	 out = s.getOutputStream();
+	        	 out.write((Function.CH + "|" + id + "|" + name + "\n").getBytes());
+			} catch (Exception e2) {
+				// TODO: handle exception
+			}
+	         wr.ta.append(s + "\n");
+	         wr.tf.setText("");
+		}
 		
+	}
+
+	@Override
+	public void run() {
 		
 	}
 

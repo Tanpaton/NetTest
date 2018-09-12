@@ -115,7 +115,15 @@ public class Server implements Runnable{
 							name = st.nextToken();
 							location = "캐릭터선택";
 							
-							messageAll((name+"|"+location));
+							messageAll((st+"|"+location));
+						}
+						case Function.MYLOG:
+						{
+							location ="대기실";
+						}
+						case Function.CH:
+						{
+							location ="대기실";
 						}
 					}
 					
