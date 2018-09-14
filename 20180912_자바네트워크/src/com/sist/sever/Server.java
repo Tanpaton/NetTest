@@ -38,6 +38,8 @@ public class Server implements Runnable{
 	private ArrayList<Client> waitList =new ArrayList<Client>();
 	//클라이언트의 IP, id....
 	
+	Vector<Room> roomVc=new Vector<Room>(); // table1 
+	
 	public Server() { //프로그램에서 시작과 동시 수행: 생선자, main
 		//서버 ==> 구동할때 한개 컴퓨터에서 두번을 실행 할 수 없다.
 		try {			
@@ -174,20 +176,35 @@ public class Server implements Runnable{
 	    				  
 						case Function.MAKEROOM:
 						{
+							/*public Room(String roomName, String roomState, String roomPwd, int maxcount) {
+								current=1;
+								this.roomName = roomName;
+								this.roomState = roomState;
+								this.roomPwd = roomPwd;
+								this.maxcount = maxcount;
+							}*/
 //(Function.MAKEROOM + "|" + rname + "|" + state + "|" + pwd + "|" + (inwon + 2) 
-							String rname=st.nextToken();
+							/*String rname=st.nextToken();
 							String state=st.nextToken();
 							String pwd;
-							String inwon;
+							String inwon;*/
+							// 데이터 받기
+							Room room=new Room(
+									st.nextToken(),
+									st.nextToken(), 
+									st.nextToken(), 
+									Integer.parseInt(st.nextToken()));
+							room.userVc.addElement(this);
 							
-							if(state.equals("비공개")) {
+							
+							/*if(state.equals("비공개")) {
 								pwd=st.nextToken();
 								inwon=st.nextToken();
 								messageAll(Function.MAKEROOM+"|"+(roomnumber++)+"|"+rname+"|"+state+"|"+inwon+"|"+pwd);
 							}else {
 								inwon=st.nextToken();
 								messageAll(Function.MAKEROOM+"|"+(roomnumber++)+"|"+rname+"|"+state+"|"+inwon);
-							}
+							}*/
 							
 						}
 					}

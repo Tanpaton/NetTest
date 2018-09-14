@@ -12,7 +12,7 @@ import java.util.*;
  *  }
  */
 public class Room {
-	ArrayList<Server.Client> userList = new ArrayList<Server.Client>();
+	Vector<Server.Client> userVc = new Vector<Server.Client>();
 	//방에 들어간 사람 명단 저장!!!!
 	String roomName, roomState, roomPwd;
 	int current; //현재인원
