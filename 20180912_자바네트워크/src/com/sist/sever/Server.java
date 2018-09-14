@@ -31,6 +31,7 @@ public class Server implements Runnable{
 	private final int PORT=7339;
 	private String name;
 	private String location;
+	private int roomnumber=1;
 	
 	
 	//클라이언트의 정보를 저장
@@ -78,11 +79,13 @@ public class Server implements Runnable{
 	}	
 	
 	//통신 준비 ==> 내부 클래스
-	class Client extends Thread
+	public class Client extends Thread
 	{
 		//로그인시 전송하는 데이터 id, name
 		String id;
 		String name;
+		//String str;
+		String pos;
 		Socket s; //연결
 		BufferedReader in;
 		OutputStream out;
@@ -99,31 +102,93 @@ public class Server implements Runnable{
 			}
 		}
 		//통신
+		/*
+		 *  <======서버 ========>
+		 *     (2)데이터를 받아서 처리!
+		 *     
+		 *      
+		 *  <======클라이언트 =====>
+		 *     (1)요청을 위해 필요한 데이터를 전송
+		 *        ex) 로그인  : id, pwd
+		 *     (3)결과값을 받아서 화면을 출력!
+		 */
 		public void run()
 		{
 			try {
-				// 100|id|name 이런식으로 보낸다.
+				// 100|id|name 이런식으로 받는다
 				while(true) {
 					String msg=in.readLine();//클라이언트에서 전송한 메세지  처리후 결과값 보내기
 					System.out.println("Client=>요청값 : "+msg);
+					
+					
+					// 100|id|name 이런식으로 받는다
+					// 번호 ==> 기능(행위)의 요청번호
 					StringTokenizer st=new StringTokenizer(msg, "|");
 					int no=Integer.parseInt(st.nextToken());
 					switch(no)
 					{
 						case Function.LOGIN:
 						{
-							name = st.nextToken();
-							location = "캐릭터선택";
+							//name = st.nextToken();
+							//location = "캐릭터선택";
+							id=st.nextToken();
+							name=st.nextToken();
+							pos="대기실";
 							
-							messageAll((st+"|"+location));
+							// (*1*)제일 먼저 접속한 사람들에게 자신이 접속했다는 것을 알린다.
+							messageAll(Function.LOGIN+"|"+id+"|"+name+"|"+pos);//접속한 모든 사람에게 로그인을 알려준다~(테이블에 출력)
+							
+							//(*2*)이후에 자신을 접속 시킨다.			
+							waitList.add(this);
+							
+							// (*3*) 로그인 ==> 대기실로 화면을 변경시킨다.
+							messageAll(Function.MYLOG+"|"+(id+"님이 접속하셨습니다"));
+							
+							// (*4*) 자신에게만 접속한 사람들의 정보를 뿌린다.
+							for(Client client:waitList)
+							{
+								messageTo(Function.LOGIN+"|"
+							              +client.id+"|"
+										  +client.name+"|"
+							              +client.pos);
+							}
+							
+							//개설된 방 전송!
+							/*
+							 *  
+							 *  로그인
+							 *  방개설
+							 *  방들어가기
+							 *  방나가기
+							 *  ==> 위에 4개만 잘하면 게임프로그램은 아무것도 아니다~
+							 */
 						}
-						case Function.MYLOG:
-						{
-							location ="대기실";
-						}
+						break;
+						//채팅 요청 처리
 						case Function.CH:
+	    				  {
+	    					  String data=st.nextToken();
+	    					  messageAll(Function.CH+"|["+name+"]"+data);
+	    				  }
+	    				  break;
+	    				  
+						case Function.MAKEROOM:
 						{
-							location ="대기실";
+//(Function.MAKEROOM + "|" + rname + "|" + state + "|" + pwd + "|" + (inwon + 2) 
+							String rname=st.nextToken();
+							String state=st.nextToken();
+							String pwd;
+							String inwon;
+							
+							if(state.equals("비공개")) {
+								pwd=st.nextToken();
+								inwon=st.nextToken();
+								messageAll(Function.MAKEROOM+"|"+(roomnumber++)+"|"+rname+"|"+state+"|"+inwon+"|"+pwd);
+							}else {
+								inwon=st.nextToken();
+								messageAll(Function.MAKEROOM+"|"+(roomnumber++)+"|"+rname+"|"+state+"|"+inwon);
+							}
+							
 						}
 					}
 					
